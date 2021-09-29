@@ -1,0 +1,147 @@
+//
+// Protocol buffers definition for Silo server
+//
+syntax = "proto3";
+package pt.tecnico.sauron.silo.grpc;
+
+import "google/protobuf/timestamp.proto";
+
+enum ObjectType {
+    PERSON = 0;
+    CAR = 1;
+}
+
+message Obs {
+    google.protobuf.Timestamp timestamp = 1;
+    string camera_name = 2;
+    double coord1 = 3;
+    double coord2 = 4;
+    ObjectType objectType = 5;
+    string objectId = 6;
+}
+
+message Cam {
+    string name = 1;
+    double coord1 = 2;
+    double coord2 = 3;
+}
+
+message CamJoinRequest {
+    string name = 1;
+    double coord1 = 2;
+    double coord2 = 3;
+}
+
+message CamJoinResponse {
+}
+
+message CamInfoRequest {
+    string name = 1;
+}
+
+message CamInfoResponse {
+    UpdateTimestamp timestamp = 1;
+    double coord1 = 2;
+    double coord2 = 3;
+}
+
+message ReportRequest {
+    string name = 1;
+    repeated Obs obs_list = 2;
+}
+
+message ReportResponse {
+}
+
+message TrackRequest {
+    ObjectType objectType = 1;
+    string id = 2;
+}
+
+message TrackResponse {
+    UpdateTimestamp timestamp = 1;
+    Obs obs = 2;
+}
+
+message TrackMatchRequest {
+    ObjectType objectType = 1;
+    string id = 2;
+}
+
+message TrackMatchResponse {
+    UpdateTimestamp timestamp = 1;
+    repeated Obs obs_list = 2;
+}
+
+message TraceRequest {
+    ObjectType objectType = 1;
+    string id = 2;
+}
+
+message TraceResponse {
+    UpdateTimestamp timestamp = 1;
+    repeated Obs obs_list = 2;
+}
+
+message PingRequest{
+    string txt = 1;
+}
+
+message PingResponse{
+    string txt =1;
+}
+
+message ClearRequest{
+
+}
+
+message ClearResponse{
+
+}
+
+message InitRequest{
+    repeated Obs obs_list = 1;
+    repeated Cam cam_list = 2;
+}
+
+message InitResponse{
+
+}
+
+message UpdateTimestamp {
+    repeated int32 timestamp = 1;
+}
+
+message Updt {
+    int32 version = 1;
+    repeated Obs observations = 2;
+    repeated Cam cameras = 3;
+}
+
+message UpdtList {
+    repeated Updt updates = 1;
+}
+
+message UpdtLog {
+    int32 replica = 1;
+    UpdateTimestamp updateTimestamp = 2;
+    repeated UpdtList replicasUpdates = 3;
+}
+
+message GossipResponse {
+
+}
+
+// service
+service Sauron {
+    rpc CtrlClear(ClearRequest) returns (ClearResponse);
+    rpc CtrlInit(InitRequest) returns (InitResponse);
+    rpc CtrlPing(PingRequest) returns (PingResponse);
+    rpc CamJoin(CamJoinRequest) returns (CamJoinResponse);
+    rpc CamInfo(CamInfoRequest) returns (CamInfoResponse);
+    rpc Report(ReportRequest) returns (ReportResponse);
+    rpc Track(TrackRequest) returns (TrackResponse);
+    rpc TrackMatch(TrackMatchRequest) returns (TrackMatchResponse);
+    rpc Trace(TraceRequest) returns (TraceResponse);
+    rpc Gossip(UpdtLog) returns (GossipResponse);
+}
